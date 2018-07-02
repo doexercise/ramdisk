@@ -5,7 +5,9 @@ PWD         = $(shell pwd)
 #ccflags-y		= -std=gnu99
 
 obj-m			= $(TARGET_NAME).o
+obj-m			= multiq.o
 $(TARGET_NAME)-objs	= main.o
+multiq-y		+= mq.o
 
 
 all: 
