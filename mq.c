@@ -27,7 +27,7 @@ static blk_status_t mq_queue_rq_fn(struct blk_mq_hw_ctx *hctx, const struct blk_
 	blk_mq_start_request(bd->rq);
 	return BLK_STS_OK;
 }
-
+ 
 static void mq_complete_fn(struct request *rq)
 {
 	printk("%s function called\n", __func__);
