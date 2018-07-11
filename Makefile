@@ -1,13 +1,15 @@
-TARGET_NAME = ckun
+MODULE_1    = ckun
+MODULE_2    = multiq
 KERNEL_DIR  = /lib/modules/$(shell uname -r)/build
 PWD         = $(shell pwd)
 
 #ccflags-y		= -std=gnu99
 
-obj-m			= $(TARGET_NAME).o
-obj-m			= multiq.o
-$(TARGET_NAME)-objs	= main.o
-multiq-y		+= mq.o
+obj-m			:= $(MODULE_1).o
+$(MODULE_1)-y		+= main.o
+
+obj-m			+= $(MODULE_2).o
+$(MODULE_2)-y		+= mq.o
 
 
 all: 

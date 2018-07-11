@@ -20,14 +20,53 @@ struct mq_ext {
 struct mq_ext ext;
 unsigned long disk_size = 4;	// default 4GB
 
+void write_copy(struct request *req, void *dst)
+{
+	void *src;
+	struct bio_vec bvec;
+	struct req_iterator iter;
+
+	rq_for_each_segment(bvec, req, iter) {
+		src = page_address(bvec.bv_page) + bvec.bv_offset;
+		memcpy(dst, src, bvec.bv_len);
+		dst += bvec.bv_len;
+	}
+}
+
+void read_copy(struct request *req, void *src)
+{
+	void *dst;
+	struct bio_vec bvec;
+	struct req_iterator iter;
+
+	rq_for_each_segment(bvec, req, iter) {
+		dst = page_address(bvec.bv_page) + bvec.bv_offset;
+		memcpy(dst, src, bvec.bv_len);
+		src += bvec.bv_len;
+	}
+}
+
 static blk_status_t mq_queue_rq_fn(struct blk_mq_hw_ctx *hctx, const struct blk_mq_queue_data *bd)
 {
-	printk("%s function called\n", __func__);
+	struct request *req = bd->rq;
+	void *addr;
 
-	blk_mq_start_request(bd->rq);
+	//printk("%s function called\n", __func__);
+
+	blk_mq_start_request(req);
+
+	addr = ext.addr + (blk_rq_pos(req) << 9);
+	if (op_is_write(req_op(req))) {
+		write_copy(req, addr);
+	}
+	else {
+		read_copy(req, addr);
+	}
+	blk_mq_end_request(req, BLK_STS_OK);
+
 	return BLK_STS_OK;
 }
- 
+
 static void mq_complete_fn(struct request *rq)
 {
 	printk("%s function called\n", __func__);
